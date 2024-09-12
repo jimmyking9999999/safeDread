@@ -63,8 +63,24 @@ boolean safeToContinue(string snarf) {
 
 
 void main() {
-	boolean proceed = safeToContinue(to_string(my_location()));
-	if (!proceed){
-		abort(abortMessage);
+	// print(to_string(my_location()));
+	matcher zoneParse = create_matcher("Dreadsylvanian (\\w+)",my_location());
+		
+	if (zoneParse.find()){
+		string zone = to_string(zoneParse.group(1));
+
+		boolean proceed = True;
+		if (zone == "Woods"){
+			proceed = safeToContinue("Forest");
+		}
+		else {
+			proceed = safeToContinue(zone);
+		}
+
+		if (!proceed){
+			abort(abortMessage);
+		}	
 	}
+
+	
 }
