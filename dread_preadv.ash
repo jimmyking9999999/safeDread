@@ -1,14 +1,24 @@
 // Globals
 
 // number of monsters to leave alive in a zone
-int protecc = 1000;
+int protecc = 10;
 // whether to ignore the above clobber-protection (currently unimplemented)
-boolean rundown = false;
+// boolean rundown = false;
 // sanity check counter to make sure the number of monsters remaining matches what we expect it to be
 // int[string] left = {"Forest": 1000, "Village": 1000, "Castle": 1000};
 string abortMessage = "";
+// set_property("_safeDread_clan","ASS");
 
-// Function to check monsters left in a given location
+//function to initialize our preferences
+void initPrefs() {
+	set_property("_safeDread_clan",get_clan_name());
+	set_property("_safeDread_Forest",1337);
+	set_property("_safeDread_Village",1337);
+	set_property("_safeDread_Castle",1337);
+	set_property("_safeDread_clear","none");
+}
+
+// Function to clear us to proceed
 boolean safeToContinue(string snarf) {
 	// Check the dungeon logs, parse out the monsters left in this zone and also see how many skills are left in The Machine
 	string raidLog = visit_url("clan_raidlogs.php");
@@ -19,11 +29,11 @@ boolean safeToContinue(string snarf) {
 		skillsLeft -= group_count(checkSkills);
 	}
 
-	print("skills left: " + to_string(skillsLeft));
+	//print("skills left: " + to_string(skillsLeft));
 
 	if (checkLeft.find()) {
 		int remaining = 1000 - to_int(checkLeft.group(1));
-		print("There are " + remaining + " monsters left in the " + snarf,"green");
+		// print("There are " + remaining + " monsters left in the " + snarf,"green");
 		int safetyCheck = remaining - 1;
 
 		if (safetyCheck < protecc){
@@ -36,22 +46,54 @@ boolean safeToContinue(string snarf) {
 			return false;
 		}
 
-		// add logic to check against left for the zone. To get this working in a preadv I'll need to use a preference
+		// logic to make sure we're not adventuring at the same time as anyone else
 
-		// switch {
-		// 	case left[snarf] != remaining && (left[snarf] == 1000 || remaining >= 300):
-		// 		//initial run
-		// 		print("Expected to find " + left[snarf] + " monsters left in the " + snarf + ", but found " + remaining);
-		// 		left[snarf] = remaining;
-		// 		return remaining;
-		// 	case left[snarf] != remaining && remaining < 300:
-		// 		//mismatch, so someone else is adventuring, and there are few enough monsters left that we want to be careful
-		// 		left[snarf] = remaining;
-		// 		print("Expected to find " + left[snarf] + " monsters left in the " + snarf + ", but found " + remaining + ", which is less than 300", "red");
-		// 		return remaining;
-		// 	default:
-		// 		return remaining;
-		// }
+		switch (snarf) {
+			case "Forest":
+				switch {
+					case get_property("_safeDread_Forest") == 1337 || get_property("_safeDread_Forest") < remaining:
+						//either the initial run or we lost a fight; set with the number we just pulled from logs
+						set_property("_safeDread_Forest",remaining);
+					case get_property("_safeDread_Forest") > remaining:
+						//more monsters have been killed than we expect; abort!
+						print("snarf: " + snarf + "remaining: " + remaining + " _safeDread_Forest" + get_property(" _safeDread_Forest")); //DEBUG
+						abortMessage = "More monsters have been killed in the forest than we can account for. Check with your clan to make sure you're the only one in this zone, then run `set _safeDread_Forest = 1337` in the cli";
+						//return false;
+					default:
+						//no issues; decrement our counter
+						set_property("_safeDread_Forest",safetyCheck);
+				}
+			case "Village":
+				switch {
+					case get_property("_safeDread_Village") == 1337 || get_property("_safeDread_Village") < remaining:
+						//either the initial run or we lost a fight; set with the number we just pulled from logs
+						set_property("_safeDread_Village",remaining);
+					case get_property("_safeDread_Village") > remaining:
+						//more monsters have been killed than we expect; abort!
+						print("snarf: " + snarf + "remaining: " + remaining + " _safeDread_Village" + get_property(" _safeDread_Village")); //DEBUG
+						abortMessage = "More monsters have been killed in the Village than we can account for. Check with your clan to make sure you're the only one in this zone, then run `set _safeDread_Village = 1337` in the cli";
+						//return false;
+					default:
+						//no issues; decrement our counter
+						set_property("_safeDread_Village",safetyCheck);
+
+				}
+			case "Castle":
+				switch {
+					case get_property("_safeDread_Castle") == 1337 || get_property("_safeDread_Castle") < remaining:
+						//either the initial run or we lost a fight; set with the number we just pulled from logs
+						set_property("_safeDread_Castle",remaining);
+					case get_property("_safeDread_Castle") > remaining:
+						//more monsters have been killed than we expect; abort!
+						print("snarf: " + snarf + "remaining: " + remaining + " _safeDread_Castle" + get_property(" _safeDread_Castle")); //DEBUG
+						abortMessage = "More monsters have been killed in the Castle than we can account for. Check with your clan to make sure you're the only one in this zone, then run `set _safeDread_Castle = 1337` in the cli";
+						//return false;
+					default:
+						//no issues; decrement our counter
+						set_property("_safeDread_Castle",safetyCheck);
+				}
+
+		}
 		return true;
 	}
 
@@ -76,6 +118,12 @@ void main() {
 	matcher zoneParse = create_matcher("Dreadsylvanian (\\w+)",my_location());
 		
 	if (zoneParse.find()){
+
+		if(get_property("_safeDread_clan") != get_clan_name()){
+			//we've changed clans; refresh everything
+			initPrefs();
+		}
+
 		string zone = to_string(zoneParse.group(1));
 
 		boolean proceed = True;
@@ -86,7 +134,7 @@ void main() {
 			proceed = safeToContinue(zone);
 		}
 
-		if (!proceed){
+		if (!proceed && get_property("_safeDread_clear") != zone){
 			abort(abortMessage);
 		}	
 	}
