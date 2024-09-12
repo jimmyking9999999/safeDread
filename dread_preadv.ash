@@ -1,7 +1,7 @@
 // Globals
 
 // number of monsters to leave alive in a zone
-int protecc = 600;
+int protecc = 1000;
 // whether to ignore the above clobber-protection (currently unimplemented)
 boolean rundown = false;
 // sanity check counter to make sure the number of monsters remaining matches what we expect it to be
@@ -14,7 +14,12 @@ boolean safeToContinue(string snarf) {
 	string raidLog = visit_url("clan_raidlogs.php");
 	matcher checkLeft = create_matcher("has defeated <b>(\\d+)</b> monster\\(s\\) in the " + snarf,raidLog);
 	matcher checkSkills = create_matcher("used The Machine",raidLog);
-	int skillsLeft = 3 - group_count(checkSkills);
+	int skillsLeft = 3;
+	if(checkSkills.find()){
+		skillsLeft -= group_count(checkSkills);
+	}
+
+	print("skills left: " + to_string(skillsLeft));
 
 	if (checkLeft.find()) {
 		int remaining = 1000 - to_int(checkLeft.group(1));
@@ -22,7 +27,7 @@ boolean safeToContinue(string snarf) {
 		int safetyCheck = remaining - 1;
 
 		if (safetyCheck < protecc){
-			if (snarf == "Dreadsylvanian Castle" && skillsLeft > 0) {
+			if (snarf == "Castle" && skillsLeft > 0) {
 				abortMessage = "Your next adventure would bring " + get_clan_name() + " down below " + to_string(protecc) + " monsters in the " + snarf + " and there are still " + to_string(skillsLeft) + " skills left in The Machine! Aborting!";
 			}
 			else {
@@ -56,6 +61,10 @@ boolean safeToContinue(string snarf) {
 		if (!checkDreadOpen.find()) {
 			abortMessage = "It doesn't look like dreadsylania is open in " + get_clan_name();
 			return false;
+		}
+		else{
+			//Dread's open, we just haven't killed anything in this zone yet. Proceed!
+			return true;
 		}
 	}
 	return false;
