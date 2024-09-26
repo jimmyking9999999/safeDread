@@ -34,7 +34,7 @@ boolean safeToContinue(string snarf) {
 	if (checkLeft.find()) {
 
 		if (get_property("safeDread_clear") == snarf) {
-			return true
+			return true;
 		}
 
 		int remaining = 1000 - to_int(checkLeft.group(1));
