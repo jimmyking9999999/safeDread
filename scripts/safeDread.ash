@@ -58,9 +58,9 @@ boolean safeToContinue(string snarf) {
 				switch {
 					case get_property("_safeDread_Forest") == 1337 || get_property("_safeDread_Forest") < remaining:
 						//either the initial run or we lost a fight; set with the number we just pulled from logs
-						set_property("_safeDread_Forest",remaining);
+						set_property("_safeDread_Forest",safetyCheck);
 						break;
-					case get_property("_safeDread_Forest") > remaining:
+					case get_property("_safeDread_Forest") > safetyCheck:
 						//more monsters have been killed than we expect; abort!
 						print("snarf: " + snarf + "remaining: " + remaining + " _safeDread_Forest" + get_property("_safeDread_Forest")); //DEBUG
 						abortMessage = "More monsters have been killed in the forest than we can account for. Check with your clan to make sure you're the only one in this zone, then run `set _safeDread_Forest = 1337` in the cli";
@@ -73,11 +73,11 @@ boolean safeToContinue(string snarf) {
 				switch {
 					case get_property("_safeDread_Village") == 1337 || get_property("_safeDread_Village") < remaining:
 						//either the initial run or we lost a fight; set with the number we just pulled from logs
-						set_property("_safeDread_Village",remaining);
+						set_property("_safeDread_Village",safetyCheck);
 						break;
 					case get_property("_safeDread_Village") > remaining:
 						//more monsters have been killed than we expect; abort!
-						print("snarf: " + snarf + "remaining: " + remaining + " _safeDread_Village" + get_property("_safeDread_Village")); //DEBUG
+						print("snarf: " + snarf + " remaining: " + remaining + " _safeDread_Village" + get_property(" _safeDread_Village")); //DEBUG
 						abortMessage = "More monsters have been killed in the Village than we can account for. Check with your clan to make sure you're the only one in this zone, then run `set _safeDread_Village = 1337` in the cli";
 						return false;
 					default:
@@ -89,11 +89,11 @@ boolean safeToContinue(string snarf) {
 				switch {
 					case get_property("_safeDread_Castle") == 1337 || get_property("_safeDread_Castle") < remaining:
 						//either the initial run or we lost a fight; set with the number we just pulled from logs
-						set_property("_safeDread_Castle",remaining);
+						set_property("_safeDread_Castle",safetyCheck);
 						break;
 					case get_property("_safeDread_Castle") > remaining:
 						//more monsters have been killed than we expect; abort!
-						print("snarf: " + snarf + "remaining: " + remaining + " _safeDread_Castle" + get_property("_safeDread_Castle")); //DEBUG
+						print("snarf: " + snarf + " remaining: " + remaining + " _safeDread_Castle" + get_property(" _safeDread_Castle") + "safetyCheck" + safetyCheck); //DEBUG
 						abortMessage = "More monsters have been killed in the Castle than we can account for. Check with your clan to make sure you're the only one in this zone, then run `set _safeDread_Castle = 1337` in the cli";
 						return false;
 					default:
