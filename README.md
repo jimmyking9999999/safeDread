@@ -4,7 +4,8 @@ Bring up any issues in the thread on the Ascension Speed Show discord (`/tag dre
 
 To install, enter `git checkout SaucedButLeaking/safeDread release` in mafia's cli
 
-To enable, `set preAdventureScript=safeDread.ash`
-To disable, `set preAdventureScript=` 
+To enable; run `safeDread` 
+
+TODO: easy disable 
 
 UNTESTED: if you're looking to finish clearing out one of the zones, enter `set _safeDread_clear="Forest"` (or "Village" or "Castle") 
